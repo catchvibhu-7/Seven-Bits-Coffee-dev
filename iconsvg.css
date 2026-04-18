@@ -1,0 +1,31 @@
+:root {
+    --gbit-logo: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><path d="M10 10H25V25H10ZM35 10H50V15H35ZM15 30H25V45H15Z" fill="orange"/></svg>');
+    --icon-hot: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><rect x="8" y="12" width="14" height="14" fill="white"/></svg>');
+    --icon-iced: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><rect x="8" y="8" width="14" height="18" fill="white"/></svg>');
+    --icon-matcha: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><rect x="8" y="12" width="14" height="14" fill="%2310b981"/></svg>');
+}
+
+/*.icon { display: inline-block; width: 30px; height: 30px; background-size: contain; background-repeat: no-repeat; }*/
+:root {
+    /* Define the vector logo as a data URI to load instantly */
+    --gbit-logo-vector: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1200"><defs><linearGradient id="copperGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:%23c07e60;stop-opacity:1"/><stop offset="30%" style="stop-color:%23d89d81;stop-opacity:1"/><stop offset="60%" style="stop-color:%23c07e60;stop-opacity:1"/><stop offset="85%" style="stop-color:%23b37155;stop-opacity:1"/><stop offset="100%" style="stop-color:%23c07e60;stop-opacity:1"/></linearGradient></defs><g transform="translate(150, 50)" fill="url(%23copperGradient)"><path d="M 500,200 C 450,180 300,180 300,350 L 300,450 L 500,500 Z"/><rect x="520" y="200" width="80" height="80"/><rect x="620" y="200" width="80" height="80"/><rect x="520" y="300" width="80" height="80"/><rect x="620" y="300" width="80" height="80"/><rect x="520" y="420" width="60" height="60"/><rect x="600" y="420" width="60" height="60"/><rect x="680" y="420" width="60" height="60"/><rect x="520" y="500" width="60" height="60"/><rect x="600" y="500" width="60" height="60"/><rect x="720" y="200" width="40" height="40" opacity="0.8"/><rect x="720" y="260" width="40" height="40" opacity="0.6"/><rect x="720" y="320" width="40" height="40" opacity="0.4"/><rect x="720" y="380" width="40" height="40" opacity="0.2"/><path d="M 500,600 C 480,580 470,560 470,530 L 530,530 C 530,560 520,580 500,600 Z"/><line x1="500" y1="600" x2="500" y2="700" stroke="url(%23copperGradient)" stroke-width="20" stroke-linecap="round"/><path d="M 300,450 C 300,750 700,750 700,450 L 700,600 C 700,850 300,850 300,600 L 300,450 Z" fill="none" stroke="url(%23copperGradient)" stroke-width="20"/></g></svg>');
+}
+
+/* Base class for the logo */
+.icon-logo {
+    display: block;
+    width: 250px; /* Base width */
+    height: 300px; /* Base height (match aspect ratio) */
+    background-image: var(--gbit-logo-vector);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Modifiers */
+.icon-logo-header { width: 125px; height: 150px; } /* Header size */
+.icon-logo-hero { width: 500px; height: 600px; } /* Large display size */
+.icon-logo { background-image: var(--gbit-logo); width: 60px; height: 60px; }
+.icon-hot { background-image: var(--icon-hot); }
+.icon-iced { background-image: var(--icon-iced); }
+.icon-matcha { background-image: var(--icon-matcha); }

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="iconsvg.css">
+    <title>Seven Bits OS // Hazaribagh</title>
+</head>
+<body>
+    <nav class="system-nav">
+        <button onclick="showPage('home')">01_HOME</button>
+        <button onclick="showPage('menu')">02_MENU</button>
+        <button onclick="showPage('kitchen')">03_KITCHEN</button>
+        <button onclick="showPage('admin')">04_ADMIN</button>
+    </nav>
+
+    <div id="page-home" class="page active">
+        <div class="hero-section">
+            <div class="icon-logo icon-logo-hero"></div>
+            <h1>SEVEN BITS COFFEE</h1>
+            <p class="story-text">
+                Born from Physics, Coffee, and a cat named Ginger. 
+                G is the 7th letter. 1024 bits make a whole. 
+                We don't just brew; we process flavor with low-latency precision.
+            </p>
+            <button class="btn-primary" onclick="showPage('menu')">EXECUTE ORDER_NOW</button>
+        </div>
+    </div>
+
+    <div id="page-menu" class="page">
+        <div id="menu-root"></div>
+        <div id="cart-status">BITS IN BUFFER: <span id="cart-count">0</span></div>
+    </div>
+
+    <div id="page-kitchen" class="page">
+        <div class="kitchen-tabs">
+            <button onclick="filterKitchen('BARISTA')">BARISTA & DESSERT</button>
+            <button onclick="filterKitchen('KITCHEN')">FOOD PREP</button>
+        </div>
+        <div id="kitchen-orders-root"></div>
+    </div>
+
+    <div id="page-admin" class="page">
+        </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
