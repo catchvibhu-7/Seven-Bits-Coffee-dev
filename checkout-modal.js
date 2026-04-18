@@ -15,14 +15,18 @@ export function renderCheckoutModal(cartItems, serviceChargeActive, tipApplied =
     <div id="modal-overlay" class="modal-overlay">
         <div class="modal-content">
             <h2>07 // TRANSACTION SUMMARY</h2>
-            <div class="cart-items-list">
-                ${cartItems.map(item => `
-                    <div class="cart-row">
-                        <span>${item.name}</span>
-                        <span>₹${item.price}</span>
-                    </div>
-                `).join('')}
-            </div>
+            // Inside the template literal of renderCheckoutModal
+<div class="cart-items-list">
+    ${cartItems.map(item => `
+        <div class="cart-row" style="border-bottom: 1px dashed #333; padding: 5px 0;">
+            <span class="item-qty" style="color: #d97706; font-weight: bold; margin-right: 10px;">
+                ${item.quantity}x
+            </span>
+            <span class="item-name" style="flex: 1;">${item.name}</span>
+            <span class="item-price">₹${(item.price * item.quantity).toFixed(2)}</span>
+        </div>
+    `).join('')}
+</div>
 
             <hr>
 

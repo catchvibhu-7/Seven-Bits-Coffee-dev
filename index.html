@@ -8,40 +8,71 @@
 </head>
 <body>
     <nav class="system-nav">
-        <button onclick="showPage('home')">01_HOME</button>
-        <button onclick="showPage('menu')">02_MENU</button>
-        <button onclick="showPage('kitchen')">03_KITCHEN</button>
-        <button onclick="showPage('admin')">04_ADMIN</button>
+        <button onclick="showPage('home')">HOME</button>
+        <button onclick="showPage('menu')">MENU</button>
+        <button onclick="showPage('kitchen')">KITCHEN</button>
+        <button onclick="showPage('admin')">ADMIN</button>
     </nav>
 
     <div id="page-home" class="page active">
         <div class="hero-section">
             <div class="icon-logo icon-logo-hero"></div>
             <h1>SEVEN BITS COFFEE</h1>
+            
             <p class="story-text">
                 Born from Physics, Coffee, and a cat named Ginger. 
                 G is the 7th letter. 1024 bits make a whole. 
                 We don't just brew; we process flavor with low-latency precision.
             </p>
-            <button class="btn-primary" onclick="showPage('menu')">EXECUTE ORDER_NOW</button>
+            <button class="btn-primary" onclick="showPage('menu')">ORDER_NOW</button>
+            <div class="pixel-cat-container">
+            <div class="pixel-cat"></div>
+        </div>
         </div>
     </div>
 
     <div id="page-menu" class="page">
         <div id="menu-root"></div>
-        <div id="cart-status">BITS IN BUFFER: <span id="cart-count">0</span></div>
+        <div id="cart-status">BITS IN CART: <span id="cart-count">0</span></div>
     </div>
 
     <div id="page-kitchen" class="page">
-        <div class="kitchen-tabs">
-            <button onclick="filterKitchen('BARISTA')">BARISTA & DESSERT</button>
-            <button onclick="filterKitchen('KITCHEN')">FOOD PREP</button>
-        </div>
-        <div id="kitchen-orders-root"></div>
-    </div>
+    <div class="kitchen-tabs">
+    <button class="active-station" onclick="filterKitchen('BARISTA')">BARISTA</button>
+    <button onclick="filterKitchen('KITCHEN')">KITCHEN</button>
+</div>
+    <div id="kitchen-orders-root"></div>
+</div>
 
-    <div id="page-admin" class="page">
-        </div>
+    <div id="page-admin" class="page" style="display: none;">
+    <div class="admin-wrapper">
+        <header class="admin-header">
+            <h1>SYSTEM CONFIGURATION</h1>
+            <div id="admin-sales-root">
+                </div>
+        </header>
+
+        <section class="config-controls">
+            <h3>GLOBAL PARAMETERS</h3>
+            <div class="control-group">
+                <label>SHOP NAME:</label>
+                <input type="text" id="shop-name-input" onchange="AdminPortal.updateGlobalConfig()">
+            </div>
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="tip-toggle" onchange="AdminPortal.updateGlobalConfig()">
+                    ENABLE GINGER TIP (₹7.00)
+                </label>
+            </div>
+        </section>
+
+        <section class="menu-management">
+            <h3>BIT REPOSITORY (MENU ITEMS)</h3>
+            <div id="admin-menu-list">
+                </div>
+        </section>
+    </div>
+</div>
 
     <script type="module" src="app.js"></script>
 </body>

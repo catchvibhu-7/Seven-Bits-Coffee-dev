@@ -3,6 +3,7 @@ import { CartSystem } from './cart-logic.js';
 import { renderCheckoutModal } from './checkout-modal.js';
 import { KitchenSystem } from './kitchen-logic.js';
 import { AdminConfig } from './config-logic.js';
+import { SecuritySystem } from './auth-logic.js';
 
 // --- System State ---
 let cart = [];
@@ -12,17 +13,37 @@ let currentKitchenStation = 'BARISTA';
 
 // --- Page Navigation Logic ---
 window.showPage = (pageId) => {
-    // Hide all pages
+    // 1. Hide all pages
     document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-    // Show target page
+    
+    // 2. Show target page
     const targetPage = document.getElementById(`page-${pageId}`);
     if (targetPage) targetPage.style.display = 'block';
 
-    // Contextual Boots
+    // 3. Highlight the correct Nav Tab
+    document.querySelectorAll('.system-nav button').forEach(btn => {
+        // Remove the highlight from all buttons
+        btn.classList.remove('active-tab');
+        
+        // Find the button that matches the current pageId and highlight it
+        // We check if the 'onclick' attribute contains the pageId string
+        if (btn.getAttribute('onclick').includes(`'${pageId}'`)) {
+            btn.classList.add('active-tab');
+        }
+    });
+
+    // 4. Trigger specific page logic
+    if (pageId === 'admin') {
+        import('./admin-portal.js').then(module => {
+            module.AdminPortal.init();
+        });}
     if (pageId === 'menu') renderMenu();
     if (pageId === 'kitchen') renderKitchen();
-    if (pageId === 'admin') window.AdminPortal.init();
 };
+
+// Initial boot: Highlight 'home' on load
+showPage('home');
+
 
 // --- Render Engine (Menu) ---
 function renderMenu() {
@@ -38,32 +59,76 @@ function renderMenu() {
         const items = menuData.items.filter(item => item.section === section.id);
         
         items.forEach(item => {
+            // Check if item is already in cart to show count on initial render
+            const inCart = cart.find(c => c.id === item.id);
+            const count = inCart ? inCart.quantity : 0;
+            const buttonText = count > 0 ? `ADD BIT +${count}` : `ADD BIT`;
+
             const itemEl = document.createElement('div');
             itemEl.className = 'menu-item';
             itemEl.innerHTML = `
-                <div class="icon icon-${item.icon}"></div>
-                <div class="info">
-                    <div class="name">${item.name}</div>
-                    <div class="story">${item.story}</div>
-                </div>
-                <div class="price">₹${item.price}</div>
-                <button class="btn-order" onclick="addToCart(${item.id})">ADD BIT</button>
-            `;
+    <div class="icon icon-${item.icon}"></div>
+    <div class="info">
+        <div class="name">${item.name}</div>
+        <div class="story">${item.story}</div>
+    </div>
+    <div class="price">₹${item.price}</div>
+    <button 
+        id="btn-item-${item.id}" 
+        class="btn-order ${count > 0 ? 'active-count' : ''}" 
+        onclick="addToCart(${item.id})">
+        ${buttonText}
+    </button>
+`;
             sectionEl.appendChild(itemEl);
         });
         root.appendChild(sectionEl);
     });
+    
+    
 }
 
 // --- Cart & Checkout Functionality (Preserved & Enhanced) ---
 
+// --- Improved Add to Cart (Multi-Item) ---
 window.addToCart = (id) => {
-    const item = menuData.items.find(i => i.id === id);
-    if (item) {
-        cart.push({...item});
-        document.getElementById('cart-count').innerText = cart.length;
-        console.log(`System Update: [${item.name}] added to buffer.`);
+    const existingItem = cart.find(item => item.id === id);
+    let newCount = 1;
+
+    if (existingItem) {
+        existingItem.quantity += 1;
+        newCount = existingItem.quantity;
+    } else {
+        const item = menuData.items.find(i => i.id === id);
+        if (item) {
+            cart.push({ ...item, quantity: 1 });
+        }
     }
+
+    // UPDATE BUTTON UI
+    const targetBtn = document.getElementById(`btn-item-${id}`);
+    if (targetBtn) {
+        // Keeps the text short to prevent button expansion
+        targetBtn.innerText = `ADD BIT +${newCount}`;
+        targetBtn.classList.add('active-count');
+    }
+
+    updateCartUI();
+};
+function updateCartUI() {
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    document.getElementById('cart-count').innerText = totalItems;
+}
+
+// --- Secured Navigation ---
+const originalShowPage = window.showPage;
+window.showPage = (pageId) => {
+    if (pageId === 'admin') {
+        if (!SecuritySystem.checkAccess()) {
+            if (!SecuritySystem.requestLogin()) return; // Stop if login fails
+        }
+    }
+    originalShowPage(pageId);
 };
 
 window.toggleTip = (isChecked) => {
@@ -115,6 +180,8 @@ window.processPayment = (method) => {
     
     // Reset System State
     cart = [];
+    renderMenu(); // This clears the "BITS ADDED" text on all buttons
+    updateCartUI();
     serviceChargeActive = true;
     tipApplied = false;
     document.getElementById('cart-count').innerText = "0";
@@ -125,6 +192,16 @@ window.processPayment = (method) => {
 
 window.filterKitchen = (station) => {
     currentKitchenStation = station;
+
+    // Highlight the selected kitchen tab
+    document.querySelectorAll('.kitchen-tabs button').forEach(btn => {
+        btn.classList.remove('active-station');
+        // Match based on the text or the station string passed
+        if (btn.innerText.includes(station)) {
+            btn.classList.add('active-station');
+        }
+    });
+
     renderKitchen();
 };
 
@@ -133,12 +210,13 @@ function renderKitchen() {
     if (!root) return;
     root.innerHTML = '';
 
-    const pendingOrders = KitchenSystem.orders.filter(o => o.status === 'PENDING');
+    KitchenSystem.orders.forEach(order => {
+        // Filter for items that belong to this station AND are not yet done
+        const pendingStationItems = order.items.filter(i => 
+            i.station === currentKitchenStation && i.isDone === false
+        );
 
-    pendingOrders.forEach(order => {
-        // Only show items for the currently selected kitchen tab (BARISTA vs KITCHEN)
-        const stationItems = order.items.filter(i => i.station === currentKitchenStation);
-        if (stationItems.length === 0) return;
+        if (pendingStationItems.length === 0) return;
 
         const ticket = document.createElement('div');
         ticket.className = 'kot-ticket';
@@ -148,10 +226,13 @@ function renderKitchen() {
                 <span class="order-time">${order.timestamp}</span>
             </div>
             <div class="kot-body">
-                ${stationItems.map(i => `<div class="kot-item">[ ] ${i.name}</div>`).join('')}
+                ${pendingStationItems.map(i => `
+                    <div class="kot-item">
+                        <span><strong>${i.quantity}x</strong> ${i.name}</span>
+                    </div>
+                `).join('')}
             </div>
-            <div class="kot-footer">Type: ${order.method}</div>
-            <button class="btn-complete" onclick="markCompleted('${order.id}')">DONE</button>
+            <button class="btn-complete" onclick="markCompleted('${order.id}')">MARK STATION DONE</button>
         `;
         root.appendChild(ticket);
     });
@@ -159,11 +240,29 @@ function renderKitchen() {
 
 window.markCompleted = (orderId) => {
     const order = KitchenSystem.orders.find(o => o.id === orderId);
+    
     if (order) {
-        order.status = 'COMPLETED';
-        // Add the Ginger Animation trigger here
-        triggerGingerAnimation();
-        renderKitchen();
+        // 1. Only mark items belonging to the current station as Done
+        let stationItems = order.items.filter(i => i.station === currentKitchenStation);
+        
+        stationItems.forEach(item => item.isDone = true);
+
+        // 2. Check if the entire station's work for this order is finished
+        const allStationItemsDone = stationItems.every(i => i.isDone === true);
+
+        if (allStationItemsDone) {
+            // Trigger animation only when that station is actually clear
+            if (window.triggerGingerAnimation) window.triggerGingerAnimation();
+            
+            console.log(`System Update: ${currentKitchenStation} items for ${orderId} cleared.`);
+            renderKitchen(); 
+        }
+        
+        const totalOrderDone = order.items.every(i => i.isDone === true);
+if (totalOrderDone) {
+    order.status = 'ARCHIVED'; // Final state for the database
+    console.log(`Order ${orderId} fully processed. Logging revenue...`);
+}
     }
 };
 
@@ -174,3 +273,77 @@ function triggerGingerAnimation() {
 
 // --- Initial Boot ---
 showPage('home');
+
+window.triggerGingerAnimation = () => {
+    // Create the notification element
+    const alert = document.createElement('div');
+    alert.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        left: -200px;
+        background: #d97706;
+        color: black;
+        padding: 10px 20px;
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        z-index: 10000;
+        border: 2px solid black;
+        box-shadow: 4px 4px 0px #000;
+        transition: all 1.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    `;
+    alert.innerText = "G-BIT: ORDER_READY >^..^<";
+    document.body.appendChild(alert);
+
+    // Slide in
+    setTimeout(() => { alert.style.left = '20px'; }, 100);
+    
+    // Slide out and remove
+    setTimeout(() => { 
+        alert.style.left = '110%'; 
+        setTimeout(() => alert.remove(), 1500);
+    }, 3000);
+};
+// --- Dynamic Pricing Engine ---
+function getCurrentPrice(item) {
+    const hour = new Date().getHours();
+    let price = item.basePrice;
+    
+    // Happy Hour: 2 PM (14) to 4 PM (16)
+    if (hour >= 14 && hour < 16) {
+        price = price * 0.9; // 10% Discount
+    }
+    return Math.round(price);
+}
+
+// --- Ginger's Cut & Loyalty Logic ---
+window.applyDiscounts = (subtotal, phone) => {
+    let discount = 0;
+    let message = "";
+
+    // Easter Egg: Ends in .77 or total is 1024
+    if (subtotal.toString().endsWith('77') || subtotal === 1024) {
+        discount = subtotal * 0.07;
+        message = "GINGER'S CUT: 7% Easter Egg Discount Decrypted!";
+    }
+
+    // Loyalty: Check local storage for phone 'bits'
+    const visits = localStorage.getItem(`loyalty_${phone}`) || 0;
+    if (parseInt(visits) === 6) { // 7th visit
+        message = "LOYALTY OVERFLOW: 7th Visit detected. Free Classic Item applied!";
+        // Logic to zero out most expensive Classic item
+    }
+
+    return { discount, message };
+};
+
+// --- Inventory Deduction ---
+window.deductInventory = (cart) => {
+    cart.forEach(item => {
+        for (const [ing, amt] of Object.entries(item.ingredients || {})) {
+            menuData.inventory[ing] -= amt;
+            if (menuData.inventory[ing] < 500) {
+                console.warn(`CRITICAL: Low Stock on ${ing}`);
+            }
+        }
+    });
+};

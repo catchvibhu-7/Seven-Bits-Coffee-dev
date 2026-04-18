@@ -8,7 +8,7 @@ export const menuData = {
     ],
     items: [
         // --- 01: FAST SELLERS ---
-        { id: 101, section: "fast-sellers", name: "G-Bit Latte", price: 240, icon: "hot", story: "Signature ginger-honey 'fur-mula'." },
+        { id: 101, section: "fast-sellers", name: "G-Bit Latte", price: 240, icon: "hot", story: "Signature ginger-honey 'fur-mula'.",ingredients: { "coffee-beans": 18, "milk": 200, "ginger-honey": 7 } },
         { id: 102, section: "fast-sellers", name: "1024 Cold Brew", price: 260, icon: "iced", story: "Steeped 1024 mins for maximum clarity." },
         { id: 103, section: "fast-sellers", name: "Binary Black", price: 180, icon: "hot", story: "0 or 1. Just pure specialty espresso." },
         { id: 104, section: "fast-sellers", name: "The Bit-Shake", price: 290, icon: "iced", story: "Espresso frappe with dark chocolate chips." },
@@ -51,5 +51,10 @@ export const menuData = {
         { id: 305, section: "sweets", name: "Matcha Tiramisu", price: 290, icon: "cookie", story: "Greyscale caffeine fusion." },
         { id: 306, section: "sweets", name: "Blueberry Cheesecake", price: 320, icon: "cookie", story: "Rich, heavy-duty creamy build." },
         { id: 307, section: "sweets", name: "Espresso Macarons", price: 140, icon: "cookie", story: "Pixel-sized cold brew treats." }
-    ]
+    ],
+    inventory: {
+        "coffee-beans": 10000, // in grams
+        "milk": 20000,         // in ml
+        "ginger-honey": 500    // in grams
+    },
 };
