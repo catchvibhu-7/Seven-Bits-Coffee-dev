@@ -10,7 +10,7 @@
     <nav class="system-nav">
         <button onclick="showPage('home')">HOME</button>
         <button onclick="showPage('menu')">MENU</button>
-        <button onclick="showPage('kitchen')">KITCHEN</button>
+        <button onclick="showPage('kitchen')">ORDERS</button>
         <button onclick="showPage('admin')">ADMIN</button>
     </nav>
 
@@ -36,11 +36,12 @@
         <div id="cart-status">BITS IN CART: <span id="cart-count">0</span></div>
     </div>
 
-    <div id="page-kitchen" class="page">
+   <div id="page-kitchen" class="page">
     <div class="kitchen-tabs">
-    <button class="active-station" onclick="filterKitchen('BARISTA')">BARISTA</button>
-    <button onclick="filterKitchen('KITCHEN')">KITCHEN</button>
-</div>
+        <button class="active-station" onclick="filterKitchen('BARISTA')">BARISTA</button>
+        <button onclick="filterKitchen('KITCHEN')">KITCHEN</button>
+        <button onclick="filterKitchen('MASTER')">ALL ORDERS</button>
+    </div>
     <div id="kitchen-orders-root"></div>
 </div>
 

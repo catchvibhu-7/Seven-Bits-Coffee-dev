@@ -210,29 +210,47 @@ function renderKitchen() {
     if (!root) return;
     root.innerHTML = '';
 
-    KitchenSystem.orders.forEach(order => {
-        // Filter for items that belong to this station AND are not yet done
-        const pendingStationItems = order.items.filter(i => 
-            i.station === currentKitchenStation && i.isDone === false
-        );
+    // Sort orders: Latest (newest) on top
+    const sortedOrders = [...KitchenSystem.orders].reverse();
 
-        if (pendingStationItems.length === 0) return;
+    sortedOrders.forEach(order => {
+        let itemsToDisplay = [];
+        let isMaster = (currentKitchenStation === 'MASTER');
+
+        if (isMaster) {
+            itemsToDisplay = order.items; // Show everything
+        } else {
+            // Filter for current station and only show if not done
+            itemsToDisplay = order.items.filter(i => i.station === currentKitchenStation && !i.isDone);
+        }
+
+        if (itemsToDisplay.length === 0) return;
 
         const ticket = document.createElement('div');
-        ticket.className = 'kot-ticket';
+        // Add a class if the whole order is finished
+        const isOrderComplete = order.items.every(i => i.isDone);
+        ticket.className = `kot-ticket ${isOrderComplete ? 'order-archived' : ''}`;
+        
         ticket.innerHTML = `
             <div class="kot-header">
                 <span class="order-id">#${order.id}</span>
                 <span class="order-time">${order.timestamp}</span>
             </div>
             <div class="kot-body">
-                ${pendingStationItems.map(i => `
-                    <div class="kot-item">
-                        <span><strong>${i.quantity}x</strong> ${i.name}</span>
-                    </div>
-                `).join('')}
+                ${itemsToDisplay.map(i => {
+                    // In Master view, show a checkbox for status
+                    const statusIcon = i.isDone ? ' [EXE]' : ' [WAIT]';
+                    const statusClass = i.isDone ? 'item-done' : 'item-pending';
+                    return `
+                        <div class="kot-item ${statusClass}" style="margin-bottom:4px;">
+                            <span><strong>${i.quantity}x</strong> ${i.name}</span>
+                            <span class="status-tag">${isMaster ? statusIcon : ''}</span>
+                        </div>
+                    `;
+                }).join('')}
             </div>
-            <button class="btn-complete" onclick="markCompleted('${order.id}')">MARK STATION DONE</button>
+            ${!isMaster ? `<button class="btn-complete" onclick="markCompleted('${order.id}')">MARK STATION DONE</button>` : ''}
+            ${isMaster && isOrderComplete ? `<div class="complete-banner">COMPLETE</div>` : ''}
         `;
         root.appendChild(ticket);
     });

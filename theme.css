@@ -348,3 +348,42 @@ header { border-bottom: 2px solid #d97706; padding-bottom: 20px; margin-bottom: 
     margin: 20px 0;
     border-bottom: 2px solid #1a1a1a; /* The "floor" the cat walks on */
 }
+
+/* Master View Item Styles */
+.item-pending {
+    color: #22d3ee; /* Cyan - Processing */
+}
+
+.item-done {
+    color: #555; /* Dimmed - Completed */
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.status-tag {
+    float: right;
+    font-size: 8pt;
+    font-weight: bold;
+}
+
+/* Master Ticket when everything is finished */
+.kot-ticket.order-archived {
+    background: #111;
+    border: 1px solid #333;
+    color: #444;
+    box-shadow: none;
+}
+
+.order-archived .kot-header {
+    border-color: #333;
+    color: #333;
+}
+
+.complete-banner {
+    text-align: center;
+    background: #d97706;
+    color: #000;
+    font-size: 8pt;
+    font-weight: bold;
+    margin-top: 10px;
+}
