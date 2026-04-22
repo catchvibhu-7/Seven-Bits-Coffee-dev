@@ -8,7 +8,7 @@ export const menuData = {
     ],
     items: [
         // --- 01: FAST SELLERS ---
-        { id: 101, section: "fast-sellers", name: "G-Bit Latte", price: 240, icon: "hot", story: "Signature ginger-honey 'fur-mula'.",ingredients: { "coffee-beans": 18, "milk": 200, "ginger-honey": 7 } },
+        { id: 101, section: "fast-sellers", name: "G-Bit Latte", price: 240, icon: "hot", story: "Our signature ginger-honey latte. The crowd favorite..",ingredients: { "coffee-beans": 18, "milk": 200, "ginger-honey": 7 } },
         { id: 102, section: "fast-sellers", name: "1024 Cold Brew", price: 260, icon: "iced", story: "Steeped 1024 mins for maximum clarity." },
         { id: 103, section: "fast-sellers", name: "Binary Black", price: 180, icon: "hot", story: "0 or 1. Just pure specialty espresso." },
         { id: 104, section: "fast-sellers", name: "The Bit-Shake", price: 290, icon: "iced", story: "Espresso frappe with dark chocolate chips." },
@@ -17,7 +17,7 @@ export const menuData = {
         { id: 107, section: "fast-sellers", name: "Daily Driver", price: 150, icon: "hot", story: "Batch brew. The stable, reliable drip." },
 
         // --- 02: LIMITED SERIES ---
-        { id: 108, section: "limited", name: "Quantum Cortado", price: 220, icon: "hot", story: "Mystery bean. Observe to find the flavor." },
+        { id: 108, section: "limited", name: "Quantum Cortado", price: 220, icon: "hot", story: "Mystry bean. Observe to find the flavor." },
         { id: 109, section: "limited", name: "Neon Matcha Tonic", price: 280, icon: "matcha", story: "Ceremonial matcha + tonic. High refresh rate." },
         { id: 110, section: "limited", name: "The Birthday Bit", price: 310, icon: "hot", story: "7/7 Special. Salted caramel update." },
         { id: 111, section: "limited", name: "Schrödinger's Foam", price: 270, icon: "iced", story: "Daily secret foam flavor. Sip to solve." },

@@ -1,10 +1,10 @@
-import { CartSystem } from './cart-logic.js';
-import { AdminConfig } from './config-logic.js';
+import { CartSystem } from "./cart-logic.js";
+import { AdminConfig } from "./config-logic.js";
 
 export function renderCheckoutModal(cartItems, serviceChargeActive, tipApplied = false) {
     const config = AdminConfig.loadSettings();
     const breakdown = CartSystem.calculateBreakdown(cartItems, serviceChargeActive);
-    
+
     // Add Ginger Tip if enabled and user selected it
     let finalTotal = breakdown.total;
     if (config.tipEnabled && tipApplied) {
@@ -15,9 +15,11 @@ export function renderCheckoutModal(cartItems, serviceChargeActive, tipApplied =
     <div id="modal-overlay" class="modal-overlay">
         <div class="modal-content">
             <h2>07 // TRANSACTION SUMMARY</h2>
-            // Inside the template literal of renderCheckoutModal
+            
 <div class="cart-items-list">
-    ${cartItems.map(item => `
+    ${cartItems
+        .map(
+            (item) => `
         <div class="cart-row" style="border-bottom: 1px dashed #333; padding: 5px 0;">
             <span class="item-qty" style="color: #d97706; font-weight: bold; margin-right: 10px;">
                 ${item.quantity}x
@@ -25,7 +27,9 @@ export function renderCheckoutModal(cartItems, serviceChargeActive, tipApplied =
             <span class="item-name" style="flex: 1;">${item.name}</span>
             <span class="item-price">₹${(item.price * item.quantity).toFixed(2)}</span>
         </div>
-    `).join('')}
+    `
+        )
+        .join("")}
 </div>
 
             <hr>
@@ -35,20 +39,26 @@ export function renderCheckoutModal(cartItems, serviceChargeActive, tipApplied =
                 <div class="calc-row">CGST (9.5%): <span>₹${breakdown.cgst.toFixed(2)}</span></div>
                 <div class="calc-row">SGST (9.5%): <span>₹${breakdown.sgst.toFixed(2)}</span></div>
                 
-                ${serviceChargeActive ? `
+                ${
+                    serviceChargeActive? `
                 <div class="calc-row service-charge-row">
                     SC (2%): <span>₹${breakdown.serviceCharge.toFixed(2)}</span>
                     <button class="btn-remove" onclick="window.removeServiceCharge()">[REMOVE]</button>
-                </div>` : ''}
+                </div>`
+                        : ""
+                }
 
-                ${config.tipEnabled ? `
+                ${
+                    config.tipEnabled? `
                 <div class="calc-row tip-row" style="color: #d97706; border: 1px dashed #d97706; padding: 5px; margin: 10px 0;">
                     <span>Ginger Tip (G=7):</span>
                     <label>
-                        <input type="checkbox" ${tipApplied ? 'checked' : ''} onchange="window.toggleTip(this.checked)">
+                        <input type="checkbox" ${tipApplied ? "checked" : ""} onchange="window.toggleTip(this.checked)">
                         +₹${config.tipAmount}.00
                     </label>
-                </div>` : ''}
+                </div>`
+                        : ""
+                }
 
                 <div class="calc-row total-row">TOTAL BITS: <span>₹${finalTotal.toFixed(2)}</span></div>
             </div>
@@ -62,6 +72,6 @@ export function renderCheckoutModal(cartItems, serviceChargeActive, tipApplied =
         </div>
     </div>
     `;
-    
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    document.body.insertAdjacentHTML("beforeend", modalHtml);
 }
