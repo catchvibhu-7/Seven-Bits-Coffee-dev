@@ -1,6 +1,10 @@
-import { menuData } from './brand-data.js';
-import { AdminConfig } from './config-logic.js';
-import { KitchenSystem } from './kitchen-logic.js';
+/**
+ * SEVEN BITS COFFEE - ADMIN PORTAL UI
+ * Location: /js/ui/admin-portal.js
+ */
+import { menuData } from '../core/brand-data.js';
+import { AdminConfig } from '../features/config-logic.js';
+import { KitchenSystem } from '../features/kitchen-logic.js';
 
 export const AdminPortal = {
     init() {
@@ -11,19 +15,20 @@ export const AdminPortal = {
 
     loadSettings() {
         const config = AdminConfig.loadSettings();
-        document.getElementById('tip-toggle').checked = config.tipEnabled;
-        document.getElementById('shop-name-input').value = config.shopName;
+        const tipToggle = document.getElementById('tip-toggle');
+        const shopInput = document.getElementById('shop-name-input');
+        
+        if (tipToggle) tipToggle.checked = config.tipEnabled;
+        if (shopInput) shopInput.value = config.shopName;
     },
 
-    // --- Analytics Logic ---
     renderAnalytics() {
         const salesRoot = document.getElementById('admin-sales-root');
         if (!salesRoot) return;
 
-        // In a real build, you'd pull this from a 'transactions' array
         const totalOrders = KitchenSystem.orders.length;
         const totalRevenue = KitchenSystem.orders.reduce((acc, order) => {
-            return acc + order.items.reduce((sum, item) => sum + item.price, 0);
+            return acc + order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         }, 0);
 
         salesRoot.innerHTML = `
@@ -40,16 +45,12 @@ export const AdminPortal = {
         `;
     },
 
-    // --- Menu Management ---
     renderAdminMenu() {
         const container = document.getElementById('admin-menu-list');
         if (!container) return;
 
         container.innerHTML = `
-            <div style="margin-bottom: 20px;">
-                <button onclick="AdminPortal.showAddItemForm()" class="btn-primary">+ ADD NEW BIT</button>
-            </div>
-            <table style="width: 100%; border-collapse: collapse; font-size: 9pt;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 9pt; margin-top: 20px;">
                 <thead style="color: #d97706;">
                     <tr>
                         <th align="left">ID</th>
@@ -75,13 +76,23 @@ export const AdminPortal = {
         `;
     },
 
+    updateGlobalConfig() {
+        const newName = document.getElementById('shop-name-input').value;
+        const isTipEnabled = document.getElementById('tip-toggle').checked;
+        
+        AdminConfig.saveSettings({
+            shopName: newName,
+            tipEnabled: isTipEnabled
+        });
+        console.log("System Update: Global Parameters Saved.");
+    },
+
     editPrice(id) {
         const item = menuData.items.find(i => i.id === id);
         const newPrice = prompt(`Enter new price for ${item.name}:`, item.price);
         if (newPrice && !isNaN(newPrice)) {
             item.price = parseFloat(newPrice);
             this.renderAdminMenu();
-            console.log(`System Update: Item ${id} price modified to ₹${newPrice}`);
         }
     },
 
@@ -94,4 +105,5 @@ export const AdminPortal = {
     }
 };
 
+// Ensure the portal is accessible globally for the HTML buttons
 window.AdminPortal = AdminPortal;

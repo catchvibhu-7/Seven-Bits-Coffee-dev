@@ -1,9 +1,13 @@
+/**
+ * SEVEN BITS COFFEE - SYSTEM CONFIG
+ * Location: /js/features/config-logic.js
+ */
 export const AdminConfig = {
     settings: {
         shopName: "SEVEN BITS COFFEE",
-        gstRate: 0.095, // 9.5%
+        gstRate: 0.095,
         serviceChargeRate: 0.02,
-        tipEnabled: true, // The "Ginger Tip" toggle
+        tipEnabled: true,
         tipAmount: 7,
         currency: "₹"
     },

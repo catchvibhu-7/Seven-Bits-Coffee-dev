@@ -1,5 +1,9 @@
+/**
+ * SEVEN BITS COFFEE - SECURITY SYSTEM
+ * Location: /js/features/auth-logic.js
+ */
 export const SecuritySystem = {
-    passcode: "1024", // Your default system access code
+    passcode: "1024", 
     
     checkAccess() {
         return sessionStorage.getItem('admin_auth') === 'true';
@@ -17,6 +21,6 @@ export const SecuritySystem = {
 
     logout() {
         sessionStorage.removeItem('admin_auth');
-        window.showPage('home');
+        if (window.showPage) window.showPage('home');
     }
 };

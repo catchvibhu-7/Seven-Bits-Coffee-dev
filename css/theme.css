@@ -1,0 +1,202 @@
+/**
+ * SEVEN BITS COFFEE - BRAND THEME
+ * Location: /css/theme.css
+ */
+
+body {
+    background: #0a0a0a;
+    color: #f9fafb;
+    font-family: 'Courier New', monospace;
+    margin: 0; padding: 20px;
+}
+
+/* --- System Header & Nav --- */
+header { border-bottom: 2px solid #d97706; padding-bottom: 20px; margin-bottom: 40px; }
+
+.system-nav {
+    display: flex; gap: 10px; background: #111; padding: 10px;
+    position: sticky; top: 0; z-index: 2000; border-bottom: 1px solid #333;
+}
+
+.system-nav button {
+    background: transparent;
+    color: #666;
+    border: 1px solid #333;
+    padding: 8px 18px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+}
+
+.system-nav button:hover {
+    color: #d97706;
+    border-color: #d97706;
+    background: rgba(217, 119, 6, 0.05);
+}
+
+.system-nav button.active-tab {
+    color: #d97706;
+    border-color: #d97706;
+    background: rgba(217, 119, 6, 0.1);
+    box-shadow: inset 0 0 10px rgba(217, 119, 6, 0.2);
+    font-weight: bold;
+}
+
+/* --- Page Management --- */
+.page { display: none; }
+.page.active { display: block; }
+
+/* --- Menu Components (List & Grid) --- */
+.section-container { margin-bottom: 60px; }
+.section-title { color: #d97706; text-transform: uppercase; letter-spacing: 4px; border-left: 5px solid #d97706; padding-left: 15px; margin-bottom: 20px; }
+
+/* View Mode Toggles */
+.menu-controls { margin-bottom: 20px; }
+.btn-view-toggle {
+    background: #1a1a1a; border: 1px solid #333; padding: 10px;
+    cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+}
+.btn-view-toggle:hover { border-color: #d97706; }
+
+/* UI Icons for Toggle */
+.icon-ui-list, .icon-ui-grid { width: 24px; height: 24px; display: block; background-size: contain; background-repeat: no-repeat; filter: invert(0.8); }
+
+/* Item Styling */
+.menu-item { background: #111; padding: 15px; border-radius: 4px; transition: transform 0.2s; display: flex; align-items: center; /* Default for List */}
+.menu-item:hover { transform: scale(1.02); background: #1a1a1a; }
+
+/* List View */
+.menu-list .menu-item { display: flex; align-items: center; margin: 10px 0; }
+.menu-list .price { margin-left: auto; margin-right: 20px; color: #d97706; font-weight: bold; }
+
+/* Grid View */
+.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+.menu-grid .menu-item {
+    flex-direction: column; text-align: center; justify-content: center; align-items: center;
+    background: #111; padding: 20px; min-height: 240px; border-radius: 4px;
+}
+.menu-grid .price { margin: 10px 0; color: #d97706; font-weight: bold; }
+
+/* --- Icon Mapping Fix --- */
+.icon {
+    width: 40px; height: 40px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    flex-shrink: 0;
+}
+.menu-list .icon { margin-right: 15px; }
+.menu-grid .icon { width: 60px; height: 60px; margin-bottom: 15px; }
+
+/* Filler Bits */
+.filler-bit { background: #080808; border: 1px dashed #222; opacity: 0.3; display: flex; align-items: center; justify-content: center; }
+.filler-cat {
+    width: 40px; height: 40px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 12" shape-rendering="crispEdges"><path d="M2 2h1v1H2zM5 2h1v1H5zM2 3h4v4H2zM1 4h1v3H1zM6 4h1v3H6zM2 7h1v1H2zM5 7h1v1H5zM6 5h2v1H6zM8 4h1v1H8zM9 3h1v1H9zM10 2h1v1H10z" fill="%23d97706"/></svg>');
+    background-size: contain;
+}
+
+/* --- Admin Portal Containers --- */
+.admin-wrapper { max-width: 900px; margin: 20px auto; background: #111; border: 1px solid #333; padding: 30px; }
+.admin-header { border-bottom: 2px solid #d97706; padding-bottom: 15px; margin-bottom: 30px; }
+.config-controls { background: #1a1a1a; padding: 20px; border-left: 4px solid #22d3ee; margin-bottom: 30px; }
+.control-group { margin-bottom: 15px; }
+.control-group label { display: block; font-size: 9pt; color: #888; margin-bottom: 5px; }
+.control-group input[type="text"] { background: #000; border: 1px solid #333; color: #fff; padding: 10px; width: 100%; font-family: inherit; }
+
+/* --- Buttons & Price --- */
+.price { color: #d97706; font-weight: bold; }
+.menu-list .price { margin-left: auto; margin-right: 20px; }
+
+.btn-order {
+    background: #d97706; color: black; border: none;
+    padding: 5px 15px; cursor: pointer; font-family: inherit; font-weight: bold;
+    display: flex; justify-content: center; align-items: center; transition: background 0.2s;
+}
+.menu-grid .btn-order { margin-left: 0; width: 100%; margin-top: 10px; }
+
+.btn-order.active-count {
+    background: #000 !important; color: #f59e0b !important;
+    border: 2px solid #f59e0b !important; box-shadow: inset 0 0 5px #f59e0b;
+}
+
+/* --- Checkout Modal --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center;
+    z-index: 3000;
+}
+.modal-content {
+    background: #111; border: 2px solid #d97706; padding: 30px;
+    width: 400px; font-family: 'Courier New', monospace;
+}
+.cart-row, .calc-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.total-row { color: #d97706; font-size: 1.5rem; font-weight: bold; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; }
+
+/* --- Kitchen & KOT --- */
+#kitchen-orders-root { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; }
+.kot-ticket {
+    background: #fff; color: #000; padding: 15px; width: 250px;
+    font-family: 'Courier New'; box-shadow: 5px 5px #d97706;
+}
+.item-pending { color: #22d3ee; }
+.item-done { color: #555; text-decoration: line-through; opacity: 0.6; }
+
+.kitchen-tabs { display: flex; gap: 10px; margin-bottom: 30px; }
+.kitchen-tabs button {
+    background: #000; color: #22d3ee; border: 1px solid #22d3ee;
+    padding: 12px 25px; cursor: pointer; text-transform: uppercase; font-weight: bold;
+}
+.kitchen-tabs button.active-station { background: #22d3ee; color: #000; }
+
+/* --- Hero & Animations --- */
+.hero-section { text-align: center; padding: 60px 20px; max-width: 700px; margin: 0 auto; }
+.story-text { font-size: 1rem; line-height: 1.6; color: #a3a3a3; margin: 30px 0; border-top: 1px solid #222; border-bottom: 1px solid #222; padding: 20px 0; }
+
+.btn-primary {
+    background: #d97706; color: #000; font-family: inherit;
+    font-weight: 900; font-size: 1.2rem; padding: 15px 35px;
+    border: none; cursor: pointer; text-transform: uppercase;
+    box-shadow: 4px 4px #000;
+}
+
+#cart-status {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    width: 90%; max-width: 500px; background: #d97706; color: #000;
+    padding: 15px; display: flex; justify-content: space-between; z-index: 999; font-weight: bold;
+}
+
+.pixel-cat-container { height: 60px; width: 100%; position: relative; overflow: hidden; margin: 20px 0; border-bottom: 2px solid #1a1a1a; }
+.pixel-cat {
+    width: 60px; height: 40px; position: absolute; bottom: 5px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 12" shape-rendering="crispEdges"><path d="M2 2h1v1H2zM5 2h1v1H5zM2 3h4v4H2zM1 4h1v3H1zM6 4h1v3H6zM2 7h1v1H2zM5 7h1v1H5zM6 5h2v1H6zM8 4h1v1H8zM9 3h1v1H9zM10 2h1v1H10z" fill="%23d97706"/></svg>');
+    background-size: contain; background-repeat: no-repeat;
+    animation: cat-across 12s infinite linear;
+}
+@keyframes cat-across { 0% { left: -70px; } 100% { left: 110%; } }
+
+/* --- Cyan Theme for Limited Items (Beta Build) --- */
+.section-limited .section-title, 
+.section-limited .price { 
+    color: #22d3ee; border-color: #22d3ee; 
+}
+
+.section-limited .btn-order { 
+    background: #22d3ee; 
+}
+
+/* Specific highlight for Cyan buttons when active */
+.section-limited .btn-order.active-count {
+    background: #000 !important;
+    color: #22d3ee !important;
+    border: 2px solid #22d3ee !important;
+    box-shadow: inset 0 0 5px #22d3ee;
+}
+
+.section-limited .btn-order.active-count button {
+    border-color: #22d3ee !important;
+}
