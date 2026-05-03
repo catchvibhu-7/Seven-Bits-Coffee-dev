@@ -24,13 +24,26 @@ export const KitchenSystem = {
 
     /**
      * Corrected Station Mapping:
-     * BARISTA: Drinks and Sweets (Fast Sellers, Classics, Sweets, Limited)
-     * KITCHEN: Hardware / Savory (Savory Hardware)
+     * ALL: All items
+     * BARISTA: Drinks (Fast Sellers, Classics, Limited)
+     * KITCHEN: FOOD (Savory)
+     * DESERT: Sweets,
      */
     getStation(item) {
-        const baristaSections = ['fast-sellers', 'limited', 'classics', 'sweets'];
-        return baristaSections.includes(item.section) ? 'BARISTA' : 'KITCHEN';
+    // 1. Check for Desserts first
+    if (item.section === 'sweets') {
+        return 'DESSERTS';
     }
+
+    // 2. Map other beverage-heavy sections to BARISTA
+    const baristaSections = ['fast-sellers', 'limited', 'classics'];
+    if (baristaSections.includes(item.section)) {
+        return 'BARISTA';
+    }
+
+    // 3. Default everything else (Savory Hardware) to KITCHEN
+    return 'KITCHEN';
+}
 };
 
 window.printKOT = (order) => {
@@ -39,7 +52,7 @@ window.printKOT = (order) => {
         <html>
             <body style="font-family:'Courier',monospace; width:80mm; padding:5mm; font-size:12pt; color:black;">
                 <center>
-                    <h2 style="margin:0;">*** SEVEN BITS ***</h2>
+                    <h2 style="margin:0;">*** SEVEN BITS COFFEE ***</h2>
                     <div>KITCHEN ORDER: ${order.id}</div>
                     <div style="font-size: 10pt;">${order.method}</div>
                 </center>
@@ -49,7 +62,7 @@ window.printKOT = (order) => {
                 </table>
                 <hr style="border:0; border-top:1px dashed #000; margin: 10px 0;">
                 <small>TIME: ${order.timestamp}</small>
-                <div style="text-align:center; margin-top:15px; font-size: 9pt;">--- ORDER_BITS_PUSHED ---</div>
+                <div style="text-align:center; margin-top:15px; font-size: 9pt;">--- ORDER PLACED. ---</div>
             </body>
         </html>
     `);

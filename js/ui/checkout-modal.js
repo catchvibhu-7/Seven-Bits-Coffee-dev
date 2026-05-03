@@ -13,10 +13,11 @@ export function renderCheckoutModal(cartItems, serviceChargeActive, tipApplied =
     if (!serviceChargeActive) finalTotal -= breakdown.serviceCharge;
     if (config.tipEnabled && tipApplied) finalTotal += config.tipAmount;
 
+    
     const modalHtml = `
     <div id="modal-overlay" class="modal-overlay">
         <div class="modal-content" style="border: 2px solid #d97706; background: #111; color: #f9fafb; padding: 30px; width: 400px; font-family: 'Courier New', monospace;">
-            <h2 style="letter-spacing: 2px; border-bottom: 1px solid #d97706; padding-bottom: 10px; margin-top:0;">07 // TRANSACTION SUMMARY</h2>
+            <h2 style="letter-spacing: 2px; border-bottom: 1px solid #d97706; padding-bottom: 10px; margin-top:0;">07 //<br> TRANSACTION SUMMARY</h2>
             
             <div class="cart-items-list" style="max-height: 200px; overflow-y: auto; margin: 15px 0;">
                 ${cartItems.map((item) => `
@@ -34,7 +35,7 @@ export function renderCheckoutModal(cartItems, serviceChargeActive, tipApplied =
                 <div class="calc-row" style="display: flex; justify-content: space-between; font-size: 8pt; color: #888;">SGST (9.5%): <span>₹${breakdown.sgst.toFixed(2)}</span></div>
                 
                 ${serviceChargeActive ? `
-                <div class="calc-row" style="display: flex; justify-content: space-between; font-size: 8pt; color: #888;">SERVICE_CHARGE (2%): <span>₹${breakdown.serviceCharge.toFixed(2)}</span></div>` : ""
+                <div class="calc-row" style="display: flex; justify-content: space-between; font-size: 8pt; color: #888;">SERVICE CHARGE (2%): <span>₹${breakdown.serviceCharge.toFixed(2)}</span></div>` : ""
                 }
 
                 ${config.tipEnabled ? `
@@ -53,11 +54,11 @@ export function renderCheckoutModal(cartItems, serviceChargeActive, tipApplied =
             </div>
 
             <div class="payment-options" style="display: grid; gap: 10px;">
-                <button class="btn-pay" onclick="window.processPayment('COUNTER')" style="background: #d97706; color: black; border: none; padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase;">PROCEED TO COUNTER</button>
+                <button class="btn-pay" onclick="window.processPayment('COUNTER')" style="background: #d97706; color: black; border: none; padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase;">PAY CASH</button>
                 <button class="btn-pay" style="background: #22d3ee; color: black; border: none; padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase;" onclick="window.processPayment('ONLINE')">PAY ONLINE (UPI)</button>
             </div>
             
-            <button class="btn-close" onclick="window.closeModal()" style="margin-top: 15px; width: 100%; background: #333; color: white; border: none; padding: 10px; cursor: pointer; text-transform: uppercase;">BACK_TO_MENU</button>
+            <button class="btn-close" onclick="window.closeModal()" style="margin-top: 15px; width: 100%; background: #333; color: white; border: none; padding: 10px; cursor: pointer; text-transform: uppercase;">BACK</button>
 
             ${serviceChargeActive ? `
             <div style="text-align: center; margin-top: 15px;">

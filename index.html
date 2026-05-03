@@ -1,96 +1,117 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/theme.css">
-    <link rel="stylesheet" href="css/iconsvg.css">
-    <title>Seven Bits Coffee // Hazaribagh</title>
-</head>
-<body>
-    <!-- SYSTEM NAVIGATION: Persistent header for page switching -->
-    <nav class="system-nav">
-        <button onclick="showPage('home')">HOME</button>
-        <button onclick="showPage('menu')">MENU</button>
-        <button onclick="showPage('kitchen')">ORDERS</button>
-        <button onclick="showPage('admin')">ADMIN</button>
-    </nav>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src * 'unsafe-inline' 'unsafe-eval'; img-src * data:; style-src * 'unsafe-inline';" />
+        <link rel="stylesheet" href="css/theme.css" />
+        <link rel="stylesheet" href="css/iconsvg.css" />
+        <title>Seven Bits Coffee // Hazaribagh</title>
+    </head>
+    <body>
+        <!-- SYSTEM NAVIGATION: Persistent header for page switching -->
+        <nav class="system-nav">
+            <button onclick="showPage('home')">HOME</button>
+            <button onclick="showPage('menu')">MENU</button>
+            <button onclick="showPage('kitchen')">ORDERS</button>
+            <button onclick="showPage('admin')">ADMIN</button>
+        </nav>
 
-    <!-- PAGE: HOME (Landing section with hero logo and story) -->
-    <div id="page-home" class="page active">
-        <div class="hero-section">
-            <div class="icon-logo icon-logo-hero"></div>
-            <h1>SEVEN BITS COFFEE</h1>
-            <p class="story-text">
-                Born from Physics, Coffee, and a cat named Ginger. 
-                G is the 7th letter. 1024 bits make a whole. 
-                We don't just brew; we process flavor with low-latency precision.
-            </p>
-            <button class="btn-primary" onclick="showPage('menu')">ORDER_NOW</button>
-            <div class="pixel-cat-container">
-                <div class="pixel-cat"></div>
+        <!-- PAGE: HOME (Landing section with hero logo and story) -->
+        <div id="page-home" class="page active">
+            <div class="hero-section">
+                <div class="icon-logo icon-logo-hero"></div>
+                <h1>SEVEN BITS COFFEE</h1>
+                <p class="story-text">
+                    Born from Physics, Coffee, and a cat named Ginger. G is the 7th letter. 1024 bits make a whole. We
+                    don't just brew; we process flavor with low-latency precision.
+                </p>
+                <button class="btn-primary" onclick="showPage('menu')">ORDER NOW</button>
+                <div class="pixel-cat-container">
+                    <div class="pixel-cat"></div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- PAGE: MENU (Dynamic menu rendering with view toggles) -->
-    <div id="page-menu" class="page">
-        <div class="menu-controls" style="padding: 10px; display: flex; justify-content: flex-end; gap: 15px;">
-            <!-- Icon-based View Toggles: Fixed validation by using <span> instead of <div> -->
-            <button class="btn-view-toggle" onclick="window.setViewMode('list')" title="List View">
-                <span class="icon-ui-list"></span>
-            </button>
-            <button class="btn-view-toggle" onclick="window.setViewMode('grid')" title="Grid View">
-                <span class="icon-ui-grid"></span>
-            </button>
+        <!-- PAGE: MENU (Dynamic menu rendering with view toggles) -->
+       <!-- PAGE: MENU -->
+<div id="page-menu" class="page">
+    <div class="menu-controls" style="padding: 10px; display: flex; justify-content: flex-end; gap: 15px">
+    <input type="text" id="menu-search" placeholder="SEARCH_BITS..." oninput="renderMenu(this.value)" 
+           style="background: black; border: 1px solid #333; color: #d97706; padding: 5px 10px; font-family: 'Courier New';">
+    
+    <button class="btn-view-toggle" onclick="window.setViewMode('list')">
+        <span class="icon icon-ui-list"></span>
+    </button>
+    <button class="btn-view-toggle" onclick="window.setViewMode('grid')">
+        <span class="icon icon-ui-grid"></span>
+    </button>
+</div>
+
+    <div id="menu-root"></div>
+
+    <!-- UNIFIED ACTION FOOTER -->
+    <div id="footer-actions" class="footer-container" style="display: none;">
+    <div id="cart-status" class="cart-bar" onclick="window.handleCartStatusClick()">
+        <span>BITS IN CART:</span>
+        <span id="cart-count">0</span>
+    </div>
+    
+    <button class="btn-jump-fab" onclick="window.toggleJumpMenu(event)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3">
+            <path d="M3 12h18M3 6h18M3 18h18"/>
+        </svg>
+    </button>
+</div>
+
+    <div id="jump-menu" class="jump-overlay"></div>
+</div>
+
+        <!-- PAGE: ORDERS (Kitchen Display System / KOT Management) -->
+        <div id="page-kitchen" class="page">
+            <div class="kitchen-tabs">
+                <button class="active-station" data-station="MASTER" onclick="filterKitchen('MASTER')">ALL</button>
+                <button data-station="BARISTA" onclick="filterKitchen('BARISTA')">BARISTA</button>
+                <button data-station="KITCHEN" onclick="filterKitchen('KITCHEN')">KITCHEN</button>
+                <!-- New Dessert Station -->
+                <button data-station="DESSERTS" onclick="window.filterKitchen('DESSERTS')">DESSERTS</button>
+            </div>
+            <!-- Target for dynamic KOT ticket injection -->
+            <div id="kitchen-orders-root"></div>
         </div>
-        <!-- Root element where JS injects menu categories and items -->
-        <div id="menu-root"></div>
-        <!-- Floating cart bar showing current item count -->
-        <div id="cart-status">BITS IN CART: <span id="cart-count">0</span></div>
-    </div>
 
-    <!-- PAGE: ORDERS (Kitchen Display System / KOT Management) -->
-    <div id="page-kitchen" class="page">
-        <div class="kitchen-tabs">
-            <button class="active-station" onclick="filterKitchen('BARISTA')">BARISTA</button>
-            <button onclick="filterKitchen('KITCHEN')">KITCHEN</button>
-            <button onclick="filterKitchen('MASTER')">ALL ORDERS</button>
+        <!-- PAGE: ADMIN (System configuration and menu repository) -->
+        <div id="page-admin" class="page">
+            <div class="admin-wrapper">
+                <header class="admin-header">
+                    <h1>SYSTEM CONFIGURATION</h1>
+                    <!-- Dynamic sales metrics -->
+                    <div id="admin-sales-root"></div>
+                </header>
+                <section class="config-controls">
+                    <h3>GLOBAL PARAMETERS</h3>
+                    <div class="control-group">
+                        <label for="shop-name-input">SHOP NAME:</label>
+                        <input type="text" id="shop-name-input" onchange="AdminPortal.updateGlobalConfig()" />
+                    </div>
+                    <div class="control-group">
+                        <label>
+                            <input type="checkbox" id="tip-toggle" onchange="AdminPortal.updateGlobalConfig()" />
+                            ENABLE GINGER TIP (₹7.00)
+                        </label>
+                    </div>
+                </section>
+                <section class="menu-management">
+                    <h3>BIT REPOSITORY (MENU ITEMS)</h3>
+                    <!-- List of items for price editing and deletion -->
+                    <div id="admin-menu-list"></div>
+                </section>
+            </div>
         </div>
-        <!-- Target for dynamic KOT ticket injection -->
-        <div id="kitchen-orders-root"></div>
-    </div>
 
-    <!-- PAGE: ADMIN (System configuration and menu repository) -->
-    <div id="page-admin" class="page">
-        <div class="admin-wrapper">
-            <header class="admin-header">
-                <h1>SYSTEM CONFIGURATION</h1>
-                <!-- Dynamic sales metrics -->
-                <div id="admin-sales-root"></div>
-            </header>
-            <section class="config-controls">
-                <h3>GLOBAL PARAMETERS</h3>
-                <div class="control-group">
-                    <label for="shop-name-input">SHOP NAME:</label>
-                    <input type="text" id="shop-name-input" onchange="AdminPortal.updateGlobalConfig()">
-                </div>
-                <div class="control-group">
-                    <label>
-                        <input type="checkbox" id="tip-toggle" onchange="AdminPortal.updateGlobalConfig()">
-                        ENABLE GINGER TIP (₹7.00)
-                    </label>
-                </div>
-            </section>
-            <section class="menu-management">
-                <h3>BIT REPOSITORY (MENU ITEMS)</h3>
-                <!-- List of items for price editing and deletion -->
-                <div id="admin-menu-list"></div>
-            </section>
-        </div>
-    </div>
-
-    <!-- Main JS entry point (Module type required for ES6 imports) -->
-    <script type="module" src="js/app.js"></script>
-</body>
+        <!-- Main JS entry point (Module type required for ES6 imports) -->
+        <script type="module" src="js/app.js"></script>
+    </body>
 </html>

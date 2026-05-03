@@ -14,7 +14,7 @@ let cart = [];
 let serviceChargeActive = true;
 let tipApplied = false;
 let currentKitchenStation = "BARISTA";
-let viewMode = "list"; 
+let viewMode = "list";
 
 /**
  * NAVIGATION & VIEW CONTROL
@@ -30,12 +30,12 @@ window.showPage = (pageId) => {
             if (!SecuritySystem.requestLogin()) return;
         }
     }
-    
+
     document.querySelectorAll(".page").forEach((p) => {
         p.style.display = "none";
         p.classList.remove("active");
     });
-    
+
     const targetPage = document.getElementById(`page-${pageId}`);
     if (targetPage) {
         targetPage.style.display = "block";
@@ -50,20 +50,25 @@ window.showPage = (pageId) => {
     });
 
     if (pageId === "admin") {
-        import("./ui/admin-portal.js").then((module) => { module.AdminPortal.init(); });
+        import("./ui/admin-portal.js").then((module) => {
+            module.AdminPortal.init();
+        });
     }
     if (pageId === "menu") renderMenu();
-    if (pageId === "kitchen") renderKitchen();
+    if (pageId === "kitchen" || pageId === "orders") {
+        renderKitchen();
+    }
 };
 
 /**
  * CART LOGIC
  */
 window.addToCart = (id) => {
-    const item = cart.find(i => i.id === id);
-    if (item) { item.quantity++; } 
-    else {
-        const product = menuData.items.find(i => i.id === id);
+    const item = cart.find((i) => i.id === id);
+    if (item) {
+        item.quantity++;
+    } else {
+        const product = menuData.items.find((i) => i.id === id);
         if (product) cart.push({ ...product, quantity: 1 });
     }
     updateCartUI();
@@ -71,10 +76,10 @@ window.addToCart = (id) => {
 };
 
 window.removeFromCart = (id) => {
-    const item = cart.find(i => i.id === id);
+    const item = cart.find((i) => i.id === id);
     if (item) {
         item.quantity--;
-        if (item.quantity <= 0) cart = cart.filter(i => i.id !== id);
+        if (item.quantity <= 0) cart = cart.filter((i) => i.id !== id);
     }
     updateCartUI();
     renderMenu();
@@ -92,12 +97,12 @@ function updateCartUI() {
 window.printBill = (order) => {
     const config = AdminConfig.loadSettings();
     const breakdown = CartSystem.calculateBreakdown(order.items);
-    
+
     let finalTotal = breakdown.total;
     if (!serviceChargeActive) finalTotal -= breakdown.serviceCharge;
     if (config.tipEnabled && tipApplied) finalTotal += config.tipAmount;
 
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     printWindow.document.write(`
         <html>
         <head>
@@ -115,17 +120,21 @@ window.printBill = (order) => {
                 <p style="font-size: 8pt;">Hazaribagh, Jharkhand<br>#${order.id} | ${new Date().toLocaleString()}</p>
             </div>
             <div class="hr"></div>
-            ${order.items.map(item => `
+            ${order.items
+                .map(
+                    (item) => `
                 <div class="row">
                     <span>${item.quantity}x ${item.name}</span>
                     <span>₹${(item.price * item.quantity).toFixed(2)}</span>
                 </div>
-            `).join('')}
+            `
+                )
+                .join("")}
             <div class="hr"></div>
             <div class="row">SUBTOTAL: <span>₹${breakdown.subtotal.toFixed(2)}</span></div>
             <div class="row">TAX (GST 18%): <span>₹${(breakdown.cgst + breakdown.sgst).toFixed(2)}</span></div>
-            ${serviceChargeActive ? `<div class="row">SVC CHG: <span>₹${breakdown.serviceCharge.toFixed(2)}</span></div>` : ''}
-            ${tipApplied ? `<div class="row">GINGER TIP: <span>₹${config.tipAmount.toFixed(2)}</span></div>` : ''}
+            ${serviceChargeActive ? `<div class="row">SVC CHG: <span>₹${breakdown.serviceCharge.toFixed(2)}</span></div>` : ""}
+            ${tipApplied ? `<div class="row">GINGER TIP: <span>₹${config.tipAmount.toFixed(2)}</span></div>` : ""}
             <div class="row total">TOTAL: <span>₹${finalTotal.toFixed(2)}</span></div>
             <div class="hr"></div>
             <p class="center" style="font-size: 8pt;">- G=7 | Processed with precision -</p>
@@ -136,7 +145,7 @@ window.printBill = (order) => {
 };
 
 window.printKOT = (order) => {
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     printWindow.document.write(`
         <html>
         <head>
@@ -151,9 +160,13 @@ window.printKOT = (order) => {
                 <h2>KITCHEN TICKET</h2>
                 <p>#${order.id} | TYPE: ${order.paymentMethod}</p>
             </div>
-            ${order.items.map(item => `
+            ${order.items
+                .map(
+                    (item) => `
                 <div class="item">${item.quantity}x ${item.name}</div>
-            `).join('')}
+            `
+                )
+                .join("")}
             <div style="margin-top: 20px; text-align: center; font-size: 8pt;">${new Date().toLocaleTimeString()}</div>
         </body>
         </html>
@@ -162,93 +175,174 @@ window.printKOT = (order) => {
 };
 
 /**
- * TRANSACTION FLOW
+ * TRANSACTION FLOW (REORDERED FOR IPAD BUG FIX)
  */
 window.printAndProcess = (method) => {
+    // 1. Create the permanent record first
     const orderId = KitchenSystem.pushOrder(cart, method);
-    const order = KitchenSystem.orders.find(o => o.id === orderId);
+    const order = KitchenSystem.orders.find((o) => o.id === orderId);
 
-    // Sequence the prints
-    window.printBill(order);
-    window.printKOT(order);
+    // 2. IPAD FIX: Finalize the app state BEFORE triggering the print block
+    const tempItems = [...cart]; // Local copy for printing
+    cart = [];
+    serviceChargeActive = true;
+    tipApplied = false;
+    updateCartUI();
+    document.getElementById("payment-overlay")?.remove();
+    window.closeModal();
+    renderMenu();
 
-    window.finalizeOrder();
+    // 3. Trigger Prints (These act as blocking calls in some browsers)
+    setTimeout(() => {
+        window.printBill(order);
+        window.printKOT(order);
+    }, 300); // Tiny delay to ensure DOM updates complete
 };
 
 /**
  * DYNAMIC MENU ENGINE
  */
-function renderMenu() {
+// --- Search Logic ---
+window.initSearchBar = () => {
+    const searchInput = document.getElementById("menu-search");
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            renderMenu(e.target.value);
+        });
+    }
+};
+
+/**
+ * DYNAMIC MENU ENGINE - SEVEN BITS STABLE BUILD
+ */
+window.setViewMode = (mode) => {
+    viewMode = mode;
+    renderMenu(document.getElementById("menu-search")?.value || "");
+};
+
+window.toggleJumpMenu = () => {
+    // Prevent the click from immediately triggering the document listener
+    if (event) event.stopPropagation();
+    const menu = document.getElementById("jump-menu");
+    if (!menu) return;
+
+    if (menu.style.display === "block") {
+        menu.style.display = "none";
+    } else {
+        // Build the list dynamically from menuData sections
+        menu.innerHTML = `
+            <div class="jump-header">Categories:</div>
+            ${menuData.sections
+                .map(
+                    (s) => `
+                <div class="jump-option" onclick="window.jumpTo('${s.id}')">
+                    <span class="jump-id">${s.id.padStart(2, "0")}</span> ${s.title.toUpperCase()}
+                </div>
+            `
+                )
+                .join("")}
+        `;
+        menu.style.display = "block";
+    }
+};
+
+window.jumpTo = (sectionId) => {
+    const target = document.getElementById(`section-${sectionId}`);
+    if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        document.getElementById("jump-menu").style.display = "none";
+    }
+};
+function renderMenu(filterQuery = "") {
     const root = document.getElementById("menu-root");
     if (!root) return;
     root.innerHTML = "";
 
     menuData.sections.forEach((section) => {
+        const items = menuData.items.filter((item) => 
+            item.section === section.id && 
+            item.name.toLowerCase().includes(filterQuery.toLowerCase())
+        );
+
+        if (items.length === 0) return;
+
         const sectionEl = document.createElement("section");
-        sectionEl.className = `section-container section-${section.id}`;
-        
-        const header = document.createElement("h2");
-        header.className = "section-title";
-        header.innerText = section.title;
-        sectionEl.appendChild(header);
+        sectionEl.id = `section-${section.id}`; 
+        sectionEl.className = "section-container";
+        sectionEl.innerHTML = `<h2 class="section-title">${section.title}</h2>`;
 
         const itemsContainer = document.createElement("div");
         itemsContainer.className = viewMode === "grid" ? "menu-grid" : "menu-list";
 
-        const items = menuData.items.filter((item) => item.section === section.id);
-        
         items.forEach((item) => {
             const inCart = cart.find((c) => c.id === item.id);
             const count = inCart ? inCart.quantity : 0;
-            const iconClass = `icon-${item.icon}`;
 
-            const buttonHTML = count > 0 
-                ? `<div class="btn-order active-count" style="display: flex; width: 120px; height: 38px; align-items: center;">
-                        <button onclick="window.removeFromCart(${item.id})" style="flex: 1; height: 100%; background: transparent; color: inherit; border: none; border-right: 1px solid currentColor; cursor: pointer;">-</button>
-                        <span style="flex: 1.2; text-align: center; font-size: 10pt; font-weight: bold;">${count}</span>
-                        <button onclick="window.addToCart(${item.id})" style="flex: 1; height: 100%; background: transparent; color: inherit; border: none; border-left: 1px solid currentColor; cursor: pointer;">+</button>
-                   </div>`
-                : `<button class="btn-order" style="width: 120px; height: 38px;" onclick="window.addToCart(${item.id})">ADD BIT</button>`;
+            const buttonHTML = count > 0 ? 
+                `<div class="btn-qty-container">
+                    <button onclick="window.removeFromCart(${item.id})">-</button>
+                    <span>${count}</span>
+                    <button onclick="window.addToCart(${item.id})">+</button>
+                </div>` : 
+                `<button class="btn-add-fixed" onclick="window.addToCart(${item.id})">ADD BIT</button>`;
 
             const itemEl = document.createElement("div");
             itemEl.className = "menu-item";
             itemEl.innerHTML = `
-                <span class="icon ${iconClass}"></span>
+                <span class="icon icon-${item.icon}"></span>
                 <div class="info">
                     <div class="name">${item.name}</div>
-                    <div class="story" style="font-size: 8pt; color: #666;">${item.story}</div>
+                    <div class="story">${item.story}</div>
                 </div>
-                <div class="price">₹${item.price}</div>
-                <div class="button-container">${buttonHTML}</div>
+                <div class="item-controls">
+                    <div class="price-fixed">₹${item.price}</div>
+                    <div class="action-fixed">${buttonHTML}</div>
+                </div>
             `;
             itemsContainer.appendChild(itemEl);
         });
-
-        if (viewMode === "grid") {
-            const remainder = items.length % 3;
-            if (remainder !== 0) {
-                for (let i = 0; i < (3 - remainder); i++) {
-                    const filler = document.createElement("div");
-                    filler.className = "menu-item filler-bit";
-                    filler.innerHTML = `<div class="filler-cat"></div>`;
-                    itemsContainer.appendChild(filler);
-                }
-            }
-        }
+        
         sectionEl.appendChild(itemsContainer);
         root.appendChild(sectionEl);
     });
+
+    const footer = document.getElementById("footer-actions");
+    const cartBar = document.getElementById("cart-status");
+    
+    if (footer) {
+        // ALWAYS show the footer container so the Jump Button is accessible
+        footer.style.display = "flex"; 
+    }
+
+    if (cartBar) {
+        // ONLY hide the orange cart bar if the cart is empty
+        cartBar.style.display = cart.length > 0 ? "flex" : "none";
+    }
 }
+
+// Fixed Cart Click Logic
+window.handleCartClick = () => {
+    if (cart.length > 0) {
+        renderCheckoutModal(cart, serviceChargeActive, tipApplied);
+    }
+};
 
 /**
  * KITCHEN MANAGEMENT
  */
 window.filterKitchen = (station) => {
     currentKitchenStation = station;
-    document.querySelectorAll(".kitchen-tabs button").forEach(btn => {
+
+    document.querySelectorAll(".kitchen-tabs button").forEach((btn) => {
+        // Remove active class from everyone
         btn.classList.remove("active-station");
-        if (btn.innerText.includes(station)) btn.classList.add("active-station");
+
+        // Match based on the data-station attribute instead of text
+        if (btn.getAttribute("data-station") === station) {
+            btn.classList.add("active-station");
+        }
     });
+
     renderKitchen();
 };
 
@@ -257,40 +351,104 @@ function renderKitchen() {
     if (!root) return;
     root.innerHTML = "";
 
-    KitchenSystem.orders.slice().reverse().forEach((order) => {
-        const isMaster = currentKitchenStation === "MASTER";
-        const itemsToDisplay = isMaster ? order.items : order.items.filter(i => i.station === currentKitchenStation && !i.isDone);
+    KitchenSystem.orders
+        .slice()
+        .reverse()
+        .forEach((order) => {
+            const isMaster = currentKitchenStation === "MASTER";
 
-        if (itemsToDisplay.length === 0) return;
+            // IMPORTANT: We must use KitchenSystem.getStation(i)
+            // if your items don't have the .station property directly.
+            const itemsToDisplay = isMaster
+                ? order.items
+                : order.items.filter((i) => {
+                      const station = i.station || KitchenSystem.getStation(i);
+                      return station === currentKitchenStation && !i.isDone;
+                  });
 
-        const ticket = document.createElement("div");
-        ticket.className = "kot-ticket";
-        const paidStatus = order.isPaid ? '✓ PAID' : `<button onclick="window.markPaid('${order.id}')" style="cursor:pointer; border:1px solid #000; background:none; font-size:7pt;">MARK PAID</button>`;
+            if (!isMaster && itemsToDisplay.length === 0) return;
 
-        ticket.innerHTML = `
+            const hasPendingItems = itemsToDisplay.some((i) => !i.isDone);
+
+            const ticket = document.createElement("div");
+            ticket.className = "kot-ticket";
+            const paidStatus = order.isPaid
+                ? "✓ PAID"
+                : `<button onclick="window.markPaid('${order.id}')" style="cursor:pointer; border:1px solid #000; background:none; font-size:7pt;">MARK PAID</button>`;
+
+            ticket.innerHTML = `
             <div class="kot-header">
                 <span>#${order.id}</span>
                 <span style="float:right;">${paidStatus}</span>
             </div>
             <div class="kot-body">
-                ${itemsToDisplay.map(i => `<div class="${i.isDone ? 'item-done' : 'item-pending'}"><strong>${i.quantity}x</strong> ${i.name}</div>`).join('')}
+                ${itemsToDisplay
+                    .map(
+                        (i) => `
+                    <div class="${i.isDone ? "item-done" : "item-pending"}">
+                        <strong>${i.quantity}x</strong> ${i.name}
+                        ${isMaster && i.isDone ? '<span style="font-size:7pt; opacity:0.5; margin-left:5px;">[OK]</span>' : ""}
+                    </div>
+                `
+                    )
+                    .join("")}
             </div>
-            ${!isMaster ? `<button class="btn-primary" style="width:100%; margin-top:10px; font-size:9pt; background:#d97706; color:black; border:none; padding:8px; font-weight:bold; cursor:pointer;" onclick="window.markCompleted('${order.id}')">MARK DONE</button>` : ""}
+            
+            ${
+                hasPendingItems
+                    ? `
+                <button class="btn-primary" 
+                        style="width:100%; margin-top:10px; font-size:9pt; background:#d97706; color:black; border:none; padding:8px; font-weight:bold; cursor:pointer;" 
+                        onclick="window.markCompleted('${order.id}')">
+                    ${isMaster ? "MARK ALL DONE" : "MARK DONE"}
+                </button>
+            `
+                    : ""
+            }
         `;
-        root.appendChild(ticket);
-    });
+            root.appendChild(ticket);
+        });
 }
 
 window.markPaid = (orderId) => {
-    const order = KitchenSystem.orders.find(o => o.id === orderId);
-    if (order) { order.isPaid = true; renderKitchen(); }
+    const order = KitchenSystem.orders.find((o) => o.id === orderId);
+    if (order) {
+        order.isPaid = true;
+        renderKitchen();
+    }
 };
 
 window.markCompleted = (orderId) => {
     const order = KitchenSystem.orders.find((o) => o.id === orderId);
+
     if (order) {
-        order.items.filter(i => i.station === currentKitchenStation).forEach(i => i.isDone = true);
-        window.triggerGingerAnimation();
+        // 1. Mark items as done based on current view
+        const targetItems =
+            currentKitchenStation === "MASTER"
+                ? order.items
+                : order.items.filter((i) => i.station === currentKitchenStation);
+
+        targetItems.forEach((i) => (i.isDone = true));
+
+        // 2. Generate the specific Ginger notification
+        let msg = `Order #${orderId}: `;
+        const allDone = order.items.every((i) => i.isDone);
+
+        if (allDone) {
+            msg += "Ready";
+        } else {
+            const stationLabels = {
+                DESSERTS: "Dessert ready",
+                KITCHEN: "Food ready",
+                BARISTA: "Drink ready"
+            };
+            msg += stationLabels[currentKitchenStation] || "Done";
+        }
+
+        // 3. Trigger the animation with the dynamic message
+        window.triggerGingerAnimation(msg);
+
+        // 4. CRITICAL: Re-run the render to hide the button
         renderKitchen();
     }
 };
@@ -299,21 +457,30 @@ window.markCompleted = (orderId) => {
  * UI HELPERS & MODALS
  */
 window.processPayment = (method) => {
-    const isOnline = method === 'ONLINE';
+    const isOnline = method === "ONLINE";
     const overlay = document.createElement("div");
     overlay.id = "payment-overlay";
     overlay.className = "modal-overlay";
     overlay.style.zIndex = "4000";
-    
+
     overlay.innerHTML = `
-        <div class="modal-content" style="text-align: center; border-color: ${isOnline ? '#22d3ee' : '#d97706'};">
-            <h2 style="color: ${isOnline ? '#22d3ee' : '#d97706'}; font-size: 1.2rem;">${isOnline ? 'UPI_GATEWAY' : 'COUNTER_READY'}</h2>
+        <div class="modal-content" style="text-align: center; border-color: ${isOnline ? "#22d3ee" : "#d97706"}; background: black; padding: 30px; border: 2px solid;">
+            <h2 style="color: ${isOnline ? "#22d3ee" : "#d97706"}; font-size: 1.2rem; font-family: 'Courier New', monospace;">${isOnline ? "UPI_GATEWAY" : "COUNTER_READY"}</h2>
             
-            ${isOnline ? '<div style="background:white; padding:10px; margin:10px auto; width:150px;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=sevenbits@upi" alt="QR"></div>' : '<p style="margin:20px 0;">PAYMENT PENDING AT COUNTER.</p>'}
+            ${isOnline ? '<div style="background:white; padding:10px; margin:20px auto; width:150px; border: 4px solid #22d3ee;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=sevenbits@upi" alt="QR"></div>' : "<p style=\"margin:30px 0; font-family: 'Courier New', monospace; color: white;\">PAYMENT PENDING AT COUNTER.</p>"}
             
-            <div style="display: grid; gap: 10px; margin-top: 20px;">
-                <button class="btn-primary" style="background: #d97706; color: black; border:none; padding:12px; font-weight:bold; cursor:pointer;" onclick="window.printAndProcess('${method}')">PRINT BILL & SEND KOT</button>
-                <button class="btn-close" style="background: #333; color: white;" onclick="document.getElementById('payment-overlay').remove()">CANCEL</button>
+            <div style="display: grid; gap: 15px; margin-top: 20px;">
+                <!-- MAIN ACTION -->
+                <button class="btn-primary" style="background: #d97706; color: black; border: 2px solid black; padding: 15px; font-weight: bold; cursor: pointer; font-family: 'Courier New', monospace; box-shadow: 4px 4px 0px #000;" onclick="window.printAndProcess('${method}')">PLACE ORDER</button>
+                
+                <!-- STYLED CANCEL BUTTON -->
+                <button class="btn-close" 
+                        style="background: transparent; color: #666; border: 2px solid #333; padding: 10px; font-weight: bold; cursor: pointer; font-family: 'Courier New', monospace; transition: all 0.2s;" 
+                        onmouseover="this.style.color='#fff'; this.style.borderColor='#fff';" 
+                        onmouseout="this.style.color='#666'; this.style.borderColor='#333';"
+                        onclick="document.getElementById('payment-overlay').remove()">
+                    BACK
+                </button>
             </div>
         </div>
     `;
@@ -321,6 +488,7 @@ window.processPayment = (method) => {
 };
 
 window.finalizeOrder = () => {
+    // This is now handled within printAndProcess to avoid iPad timing bugs
     document.getElementById("payment-overlay")?.remove();
     cart = [];
     serviceChargeActive = true;
@@ -336,22 +504,69 @@ if (cartStatus) {
         if (cart.length > 0) {
             renderCheckoutModal(cart, serviceChargeActive, tipApplied);
         } else {
-            alert("SYSTEM_IDLE: Select bits.");
+            alert("SYSTEM IDLE: Select bits.");
         }
     });
 }
 
 window.closeModal = () => document.getElementById("modal-overlay")?.remove();
-window.toggleTip = (check) => { tipApplied = check; window.closeModal(); document.getElementById("cart-status").click(); };
-window.removeServiceCharge = () => { serviceChargeActive = false; window.closeModal(); document.getElementById("cart-status").click(); };
+window.toggleTip = (check) => {
+    tipApplied = check;
+    window.closeModal();
+    document.getElementById("cart-status").click();
+};
+window.removeServiceCharge = () => {
+    serviceChargeActive = false;
+    window.closeModal();
+    document.getElementById("cart-status").click();
+};
 
-window.triggerGingerAnimation = () => {
+/**
+ * 1. FIXED ANIMATION (Now accepts the message argument)
+ */
+window.triggerGingerAnimation = (message) => {
+    // Added 'message' parameter
     const alertBox = document.createElement("div");
-    alertBox.style.cssText = `position: fixed; bottom: 30px; left: -200px; background: #d97706; color: black; padding: 10px 20px; z-index: 10000; border: 2px solid black; transition: all 1.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);`;
-    alertBox.innerText = "G-BIT: READY";
+    alertBox.style.cssText = `
+        position: fixed; 
+        bottom: 30px; 
+        left: -300px; 
+        background: #d97706; 
+        color: black; 
+        padding: 12px 25px; 
+        z-index: 10000; 
+        border: 2px solid black; 
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        box-shadow: 5px 5px 0px black;
+        transition: all 1s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    `;
+    alertBox.innerText = message; // This now has a valid reference
     document.body.appendChild(alertBox);
-    setTimeout(() => { alertBox.style.left = "20px"; }, 100);
-    setTimeout(() => { alertBox.style.left = "110%"; setTimeout(() => alertBox.remove(), 1500); }, 3000);
+
+    setTimeout(() => {
+        alertBox.style.left = "20px";
+    }, 100);
+    setTimeout(() => {
+        alertBox.style.left = "110%";
+        setTimeout(() => alertBox.remove(), 1000);
+    }, 4000);
 };
 
 window.showPage("home");
+
+/**
+ * GLOBAL EVENT LISTENERS
+ */
+document.addEventListener("click", (event) => {
+    const jumpMenu = document.getElementById("jump-menu");
+    const jumpButton = document.querySelector(".btn-jump-fab");
+
+    // If the menu is open...
+    if (jumpMenu && jumpMenu.style.display === "block") {
+        // Check if the click was OUTSIDE the menu AND the button
+        if (!jumpMenu.contains(event.target) && !jumpButton.contains(event.target)) {
+            jumpMenu.style.display = "none";
+        }
+    }
+});
