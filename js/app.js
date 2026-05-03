@@ -467,7 +467,7 @@ window.processPayment = (method) => {
         <div class="modal-content" style="text-align: center; border-color: ${isOnline ? "#22d3ee" : "#d97706"}; background: black; padding: 30px; border: 2px solid;">
             <h2 style="color: ${isOnline ? "#22d3ee" : "#d97706"}; font-size: 1.2rem; font-family: 'Courier New', monospace;">${isOnline ? "UPI_GATEWAY" : "COUNTER_READY"}</h2>
             
-            ${isOnline ? '<div style="background:white; padding:10px; margin:20px auto; width:150px; border: 4px solid #22d3ee;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=sevenbits@upi" alt="QR"></div>' : "<p style=\"margin:30px 0; font-family: 'Courier New', monospace; color: white;\">PAYMENT PENDING AT COUNTER.</p>"}
+            ${isOnline ? '<div style="background:white; padding:10px; margin:20px auto; width:150px; border: 4px solid #22d3ee;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=catchvibhu-1@oksbi&pn=Kumar Vaibhav&am=500&cu=INR" alt="QR"></div>' : "<p style=\"margin:30px 0; font-family: 'Courier New', monospace; color: white;\">PAYMENT PENDING AT COUNTER.</p>"}
             
             <div style="display: grid; gap: 15px; margin-top: 20px;">
                 <!-- MAIN ACTION -->
