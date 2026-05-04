@@ -563,7 +563,11 @@ header {
 .menu-section {
     scroll-margin-top: 80px;
 }
-
+/* Add this to theme.css */
+.section-header, 
+.menu-section h2 {
+    scroll-margin-top: 100px; /* This creates the buffer for the jump */
+}
 /* ==========================================================================
    9. CHECKOUT & MODAL UI
    Transactional summaries and payment triggers.
