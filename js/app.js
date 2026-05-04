@@ -249,18 +249,24 @@ window.toggleJumpMenu = () => {
 window.jumpTo = (sectionId) => {
     const section = document.getElementById(`section-${sectionId}`);
     if (section) {
-        // Find the title/header specifically to ensure it's at the very top
-        const header = section.querySelector('.section-header') || section;
+        // Target the actual heading text (usually h2 or .section-header)
+        const titleElement = section.querySelector('h2') || section.querySelector('.section-header');
         
-        // Use scrollIntoView on the header specifically
-        header.scrollIntoView({ 
-            behavior: "smooth", 
-            block: "start" 
-        });
+        if (titleElement) {
+            const headerOffset = 90; // Adjust this to match your sticky nav height
+            const elementPosition = titleElement.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-        // Close the jump menu after navigation
-        const menu = document.getElementById("jump-menu");
-        if (menu) menu.style.display = "none";
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: "smooth"
+            });
+        } else {
+            // Fallback if no specific title element is found
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        
+        document.getElementById("jump-menu").style.display = "none";
     }
 };
 function renderMenu(filterQuery = "") {
