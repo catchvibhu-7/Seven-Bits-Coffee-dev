@@ -43,22 +43,35 @@
            style="background: black; border: 1px solid #333; color: #d97706; padding: 5px 10px; font-family: 'Courier New';">
     
     <button class="btn-view-toggle" onclick="window.setViewMode('list')">
-        <span class="icon icon-ui-list"></span>
+        <span class="icon icon-hamburger"></span>
     </button>
     <button class="btn-view-toggle" onclick="window.setViewMode('grid')">
-        <span class="icon icon-ui-grid"></span>
+        <span class="icon icon-grid"></span>
     </button>
 </div>
 
     <div id="menu-root"></div>
 
+   
     <!-- UNIFIED ACTION FOOTER -->
-    <div id="footer-actions" class="footer-container" style="display: none;">
+<div id="footer-actions" class="footer-container" style="display: none;">
+    
+    <!-- JUMP MENU (NESTED INSIDE) -->
+    <!-- This now follows the footer's sticky position and 500px max-width -->
+    <div id="jump-menu" class="jump-overlay">
+        <div class="jump-header">CATEGORIES:</div>
+        <div id="jump-options-container">
+            <!-- Options injected by JS -->
+        </div>
+    </div>
+
+    <!-- CART BAR -->
     <div id="cart-status" class="cart-bar" onclick="window.handleCartStatusClick()">
         <span>BITS IN CART:</span>
         <span id="cart-count">0</span>
     </div>
     
+    <!-- JUMP BUTTON -->
     <button class="btn-jump-fab" onclick="window.toggleJumpMenu(event)">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3">
             <path d="M3 12h18M3 6h18M3 18h18"/>

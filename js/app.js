@@ -232,11 +232,11 @@ window.toggleJumpMenu = () => {
         // Build the list dynamically from menuData sections
         menu.innerHTML = `
             <div class="jump-header">Categories:</div>
-            ${menuData.sections
+            ${menuData.sections 
                 .map(
                     (s) => `
                 <div class="jump-option" onclick="window.jumpTo('${s.id}')">
-                    <span class="jump-id">${s.id.padStart(2, "0")}</span> ${s.title.toUpperCase()}
+                    <span class="jump-id">${s.title.toUpperCase()}</span>
                 </div>
             `
                 )
@@ -247,10 +247,20 @@ window.toggleJumpMenu = () => {
 };
 
 window.jumpTo = (sectionId) => {
-    const target = document.getElementById(`section-${sectionId}`);
-    if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        document.getElementById("jump-menu").style.display = "none";
+    const section = document.getElementById(`section-${sectionId}`);
+    if (section) {
+        // Find the title/header specifically to ensure it's at the very top
+        const header = section.querySelector('.section-header') || section;
+        
+        // Use scrollIntoView on the header specifically
+        header.scrollIntoView({ 
+            behavior: "smooth", 
+            block: "start" 
+        });
+
+        // Close the jump menu after navigation
+        const menu = document.getElementById("jump-menu");
+        if (menu) menu.style.display = "none";
     }
 };
 function renderMenu(filterQuery = "") {
@@ -464,10 +474,10 @@ window.processPayment = (method) => {
     overlay.style.zIndex = "4000";
 
     overlay.innerHTML = `
-        <div class="modal-content" style="text-align: center; border-color: ${isOnline ? "#22d3ee" : "#d97706"}; background: black; padding: 30px; border: 2px solid;">
-            <h2 style="color: ${isOnline ? "#22d3ee" : "#d97706"}; font-size: 1.2rem; font-family: 'Courier New', monospace;">${isOnline ? "UPI_GATEWAY" : "COUNTER_READY"}</h2>
+        <div class="modal-content" style="text-align: center; border-color: ${isOnline ? "#d97706" : "#d97706"}; background: black; padding: 30px; border: 2px solid;">
+            <h2 style="color: ${isOnline ? "#d97706" : "#d97706"}; font-size: 1.2rem; font-family: 'Courier New', monospace;">${isOnline ? "UPI GATEWAY" : "COUNTER READY"}</h2>
             
-            ${isOnline ? '<div style="background:white; padding:10px; margin:20px auto; width:150px; border: 4px solid #22d3ee;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=catchvibhu-1@oksbi&pn=Kumar Vaibhav&am=500&cu=INR" alt="QR"></div>' : "<p style=\"margin:30px 0; font-family: 'Courier New', monospace; color: white;\">PAYMENT PENDING AT COUNTER.</p>"}
+            ${isOnline ? '<div style="background:white; padding:10px; margin:20px auto; width:150px; border: 4px solid #d97706;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=catchvibhu-1@oksbi&pn=Kumar Vaibhav&am=500&cu=INR" alt="QR"></div>' : "<p style=\"margin:30px 0; font-family: 'Courier New', monospace; color: white;\">PAYMENT PENDING AT COUNTER.</p>"}
             
             <div style="display: grid; gap: 15px; margin-top: 20px;">
                 <!-- MAIN ACTION -->

@@ -3,8 +3,8 @@
  * Location: /js/features/cart-logic.js
  */
 export const CartSystem = {
-    cgst_rate: 0.095, 
-    sgst_rate: 0.095, 
+    cgst_rate: 0.05, 
+    sgst_rate: 0.05, 
     service_charge_rate: 0.02, 
     
     calculateBreakdown(items) {

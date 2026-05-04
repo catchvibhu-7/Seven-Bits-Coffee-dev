@@ -31,8 +31,8 @@ export function renderCheckoutModal(cartItems, serviceChargeActive, tipApplied =
 
             <div class="breakdown-window" style="background: #000; padding: 10px; border: 1px solid #222; margin-bottom: 20px;">
                 <div class="calc-row" style="display: flex; justify-content: space-between; margin-bottom: 5px;">SUBTOTAL: <span>₹${breakdown.subtotal.toFixed(2)}</span></div>
-                <div class="calc-row" style="display: flex; justify-content: space-between; font-size: 8pt; color: #888;">CGST (9.5%): <span>₹${breakdown.cgst.toFixed(2)}</span></div>
-                <div class="calc-row" style="display: flex; justify-content: space-between; font-size: 8pt; color: #888;">SGST (9.5%): <span>₹${breakdown.sgst.toFixed(2)}</span></div>
+                <div class="calc-row" style="display: flex; justify-content: space-between; font-size: 8pt; color: #888;">CGST (5%): <span>₹${breakdown.cgst.toFixed(2)}</span></div>
+                <div class="calc-row" style="display: flex; justify-content: space-between; font-size: 8pt; color: #888;">SGST (5%): <span>₹${breakdown.sgst.toFixed(2)}</span></div>
                 
                 ${serviceChargeActive ? `
                 <div class="calc-row" style="display: flex; justify-content: space-between; font-size: 8pt; color: #888;">SERVICE CHARGE (2%): <span>₹${breakdown.serviceCharge.toFixed(2)}</span></div>` : ""
@@ -49,7 +49,7 @@ export function renderCheckoutModal(cartItems, serviceChargeActive, tipApplied =
                 }
 
                 <div class="calc-row total-row" style="display: flex; justify-content: space-between; border-top: 1px solid #d97706; padding-top: 10px; margin-top: 5px; font-weight:bold; font-size: 1.2rem; color: #d97706;">
-                    TOTAL BITS: <span>₹${finalTotal.toFixed(2)}</span>
+                    TOTAL CACHE: <span>₹${finalTotal.toFixed(2)}</span>
                 </div>
             </div>
 

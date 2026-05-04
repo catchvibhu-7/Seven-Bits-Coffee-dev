@@ -38,8 +38,8 @@ header {
 
 .system-nav button {
     background: transparent;
-    color: #666;
-    border: 1px solid #333;
+    color:#f7f2e8;
+    border: 1px solid #f7f2e8;
     padding: 8px 18px;
     cursor: pointer;
     font-family: "Courier New", monospace;
@@ -459,17 +459,14 @@ header {
    Centering logic for the cart bar and jump-navigation FAB.
    ========================================================================== */
 .footer-container {
-    position: fixed;
+    position: sticky;
     bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 100%;
     z-index: 5000;
-    
     display: flex !important;
     flex-direction: row !important;
     align-items: center;
     justify-content: flex-end; /* Keeps button on the right */
-    
     gap: 12px;
     /* Changed width to 90vw and added horizontal padding */
     width: 90vw; 
@@ -498,7 +495,7 @@ header {
 }
 
 .btn-jump-fab {
-    position: relative; 
+    position: relative;  
     width: 48px;
     height: 48px;
     background: #d97706;
@@ -526,10 +523,14 @@ header {
    Section jump-menu used for quick menu navigation.
    ========================================================================== */
 .jump-overlay {
-    position: fixed;
-    bottom: 85px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: absolute; /* Relative to footer-container */
+    bottom: 60px;      /* Distance above the buttons */
+    right: 10px;       /* Aligns with the Jump FAB button edge */
+    
+    /* Reset centering logic */
+    left: auto !important;
+    transform: none !important;
+    
     background: #000;
     border: 2px solid #d97706;
     width: 250px;
@@ -537,11 +538,31 @@ header {
     z-index: 5001;
     box-shadow: 8px 8px 0px #000;
 }
+.jump-overlay, .cart-bar, .btn-jump-fab {
+    pointer-events: auto; /* Ensure menu items are clickable */
+}
+/* Adjust for small screens to ensure it doesn't bleed off-edge */
+@media (max-width: 540px) {
+    .jump-overlay {
+        right: 5vw; /* Matches the padding of your footer-container on mobile */
+    }
+}
 
 .jump-header { background: #d97706; color: #000; font-size: 8pt; padding: 5px 10px; font-weight: bold; }
 .jump-option { padding: 12px 15px; color: #d97706; cursor: pointer; border-bottom: 1px solid #222; }
 .jump-option:hover { background: #111; color: #fff; }
 .jump-id { opacity: 0.5; margin-right: 8px; }
+
+
+/* Offsets the scroll target so the title doesn't hide under the sticky nav */
+.section-header {
+    scroll-margin-top: 100px; /* Adjust based on your header height */
+}
+
+/* If you jump to the whole section, add it there too */
+.menu-section {
+    scroll-margin-top: 80px;
+}
 
 /* ==========================================================================
    9. CHECKOUT & MODAL UI
